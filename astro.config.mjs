@@ -19,9 +19,9 @@ export default defineConfig({
       name: 'Billiard Scoreboard',
       short_name: 'BilliardScore',
       description: 'A simple billiard scoreboard PWA',
-      theme_color: '#ffffff',
-      background_color: '#ffffff',
-      display: 'standalone',
+      theme_color: '#000000',
+      background_color: '#000000',
+      display: 'fullscreen',
       orientation: 'landscape',
       icons: [
         {
