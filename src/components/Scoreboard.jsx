@@ -45,8 +45,9 @@ export default function Scoreboard() {
   const [playerA, setPlayerA] = useState({ name: 'Jugador A', score: 0 });
   const [playerB, setPlayerB] = useState({ name: 'Jugador B', score: 0 });
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [installPrompt, setInstallPrompt] = useState(null);
 
-  // Force landscape mode using Screen Orientation API if available on mobile
+  // Focus and orientation logic
   useEffect(() => {
     const lockLandscape = async () => {
       if (typeof screen !== 'undefined' && screen.orientation && screen.orientation.lock) {
@@ -58,6 +59,27 @@ export default function Scoreboard() {
       }
     };
     lockLandscape();
+
+    // PWA Install Prompt Logic
+    const handleBeforeInstallPrompt = (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      if (typeof window !== 'undefined' && !window.matchMedia('(display-mode: standalone)').matches) {
+        setInstallPrompt(e);
+      }
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    
+    // Cleanup and App Installed Event
+    window.addEventListener('appinstalled', () => {
+      setInstallPrompt(null);
+    });
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
   }, []);
 
   return (
@@ -116,18 +138,44 @@ export default function Scoreboard() {
         </svg>
       </button>
 
-      {/* About Button */}
-      <button 
-        className="absolute bottom-6 right-6 p-2 text-gray-500 hover:text-gray-800 active:scale-95 transition-all z-10"
-        onClick={() => setIsAboutOpen(true)}
-        aria-label="Acerca de"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="16" x2="12" y2="12"></line>
-          <line x1="12" y1="8" x2="12.01" y2="8"></line>
-        </svg>
-      </button>
+      {/* Floating Buttons Group (Bottom Right) */}
+      <div className="absolute bottom-6 right-6 flex items-center gap-2 z-10">
+        {/* Install Button */}
+        {installPrompt && (
+          <button 
+            className="p-2 text-gray-500 hover:text-gray-800 active:scale-95 transition-all bg-white/70 rounded-full shadow-sm backdrop-blur-sm"
+            onClick={async () => {
+              if (installPrompt) {
+                installPrompt.prompt();
+                const { outcome } = await installPrompt.userChoice;
+                if (outcome === 'accepted') {
+                  setInstallPrompt(null);
+                }
+              }
+            }}
+            aria-label="Instalar Aplicación"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </button>
+        )}
+
+        {/* About Button */}
+        <button 
+          className="p-2 text-gray-500 hover:text-gray-800 active:scale-95 transition-all bg-white/70 rounded-full shadow-sm backdrop-blur-sm"
+          onClick={() => setIsAboutOpen(true)}
+          aria-label="Acerca de"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+        </button>
+      </div>
 
       {/* About Modal */}
       {isAboutOpen && (
