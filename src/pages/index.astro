@@ -22,6 +22,115 @@ import { pwaInfo } from 'virtual:pwa-info';
 
 		{pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
 		<script src="/src/pwa.ts"></script>
+		
+		<style is:inline>
+			/* 
+			  LEGACY FALLBACK (Android 4.4.4 / Firefox 68 / WebKit Viejo)
+			  Se activa SOLO si el navegador no soporta CSS moderno, restaurando el layout base.
+			*/
+			@supports not (color: oklch(0% 0 0)) {
+				body {
+					margin: 0; padding: 0; background: #000; color: #111827;
+				}
+				
+				/* Contenedor Principal (Flexbox antiguo + Position absoluto) */
+				body > div {
+					display: block; width: 100%; height: 100%; position: absolute; top: 0; left: 0; overflow: hidden;
+				}
+
+				div[class*="bg-white"] { background-color: #ffffff; }
+				div[class*="bg-yellow-400"] { background-color: #facc15; }
+
+				/* Lados: Izquierda y Derecha usando float para 100% de compatibilidad */
+				div[class*="flex-1"] {
+					display: block; float: left; width: 50%; height: 100%;
+					position: relative; text-align: center; padding-top: 1.5rem; box-sizing: border-box;
+				}
+
+				/* Inputs de Nombre */
+				div[class*="flex-1"] input[type="text"] {
+					width: 85%; max-width: 320px; font-size: 1.8rem; padding: 0.5rem; text-align: center;
+					border: 1px solid #ccc; border-radius: 6px; margin: 0 auto 1rem auto; display: block; color: #000;
+				}
+				
+				div[class*="max-w-sm"] input[class*="bg-yellow-300"] { background-color: #fde047; }
+				div[class*="max-w-sm"] input[class*="bg-gray-100"] { background-color: #f3f4f6; }
+
+				/* Marcador Gigante */
+				div[class*="text-[25vh]"] {
+					font-size: 25vh; line-height: 1; font-weight: bold; margin-top: 2vh; color: #000;
+				}
+
+				/* Elementos al fondo (Promedios y Botones Bajar Puntaje) */
+				div[class*="mt-auto"] {
+					position: absolute; bottom: 2rem; width: 100%; left: 0; text-align: center;
+				}
+
+				div[class*="mt-auto"] > div {
+					display: inline-block; background: rgba(255,255,255,0.9); border: 1px solid #ccc; 
+					padding: 0.25rem 1rem; font-size: 1.5rem; border-radius: 4px; margin-bottom: 1rem; color: #000;
+				}
+
+				button[aria-label="Decrement Score"] {
+					display: inline-block; width: 4rem; height: 3rem; background: #9ca3af; 
+					border: none; border-radius: 12px; cursor: pointer;
+				}
+				button[aria-label="Decrement Score"] div {
+					width: 1.5rem; height: 4px; background: #fff; margin: 0 auto;
+				}
+
+				/* Entradas (Arriba al Medio) */
+				div[class*="absolute top-0"] {
+					position: absolute; top: 0; left: 50%; margin-left: -90px; width: 180px;
+					background: #e5e7eb; padding: 1rem; text-align: center; border-bottom-left-radius: 1.5rem;
+					border-bottom-right-radius: 1.5rem; box-sizing: border-box; z-index: 10;
+				}
+				div[class*="absolute top-0"] span {
+					display: block; font-size: 1.1rem; letter-spacing: 2px; color: #374151; font-weight: bold;
+				}
+				div[class*="absolute top-0"] button:first-of-type {
+					background: none; border: none; font-size: 4.5rem; font-weight: bold; 
+					width: 100%; margin: 5px 0; color: #000; cursor: pointer; display: block;
+				}
+				button[aria-label="Decrement Innings"] {
+					display: inline-block; width: 4rem; height: 3rem; background: #9ca3af; 
+					border: none; border-radius: 12px; cursor: pointer;
+				}
+				button[aria-label="Decrement Innings"] div {
+					width: 1.5rem; height: 4px; background: #fff; margin: 0 auto;
+				}
+
+				/* Botones Flotantes y Reset */
+				button[aria-label="Reset Match"] {
+					position: absolute; bottom: 1.5rem; left: 50%; margin-left: -24px;
+					background: transparent; border: none; color: #9ca3af; padding: 0.5rem; cursor: pointer; z-index: 10;
+				}
+				
+				div[class*="bottom-6 right-6"] {
+					position: absolute; bottom: 1.5rem; right: 1.5rem; z-index: 10;
+				}
+				div[class*="bottom-6 right-6"] button {
+					display: inline-block; float: left; margin-left: 0.5rem; background: #fff;
+					border: 1px solid #ccc; border-radius: 50%; padding: 0.5rem; color: #374151; cursor: pointer;
+				}
+
+				/* Modal About */
+				div[class*="fixed inset-0"] {
+					position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+					background: rgba(0,0,0,0.6); z-index: 50; display: block;
+				}
+				div[class*="fixed inset-0"] > div {
+					position: absolute; top: 50%; left: 50%; width: 340px; margin-left: -170px;
+					margin-top: -220px; background: #fff; padding: 2rem; border-radius: 1rem;
+					text-align: center; box-sizing: border-box;
+				}
+				div[class*="fixed inset-0"] p { color: #374151; }
+				div[class*="fixed inset-0"] a {
+					display: block; padding: 1rem; margin-top: 0.5rem; text-decoration: none;
+					background: #f3f4f6; color: #111827; border-radius: 8px; font-weight: bold;
+				}
+			}
+		</style>
 	</head>
 	<body class="bg-black overflow-hidden font-sans select-none antialiased text-gray-900">
 		<Scoreboard client:load />
